@@ -1,6 +1,10 @@
 package fr.skyost.owngarden.listener;
 
 import fr.skyost.owngarden.OwnGarden;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.TreeType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -28,7 +32,11 @@ public class GlobalEventsListener implements Listener {
             return;
         }
 
-        // Location location = event.getLocation();
+        Location location = event.getLocation();
+        TreeType treeType = event.getSpecies();
+
+        this.plugin.log(ChatColor.WHITE, location + " " + treeType);
+        
         // val structures = plugin.pluginConfig!!.getStructures(location.block.type)
         // if (plugin.worldEditOperations!!.growTree(structures, location)) {
         // if (structures === plugin.pluginConfig!!.saplingDarkOakStructures) {
@@ -42,7 +50,7 @@ public class GlobalEventsListener implements Listener {
         // }
 
         // //event.getBlocks().clear();
-        event.setCancelled(true);
+        // event.setCancelled(true);
     }
 
     // companion object {

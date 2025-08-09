@@ -2,6 +2,7 @@ package fr.skyost.owngarden.config;
 
 import fr.skyost.owngarden.util.Skyoconfig;
 import org.bukkit.Material;
+import org.bukkit.TreeType;
 
 import java.io.File;
 import java.util.Arrays;
@@ -83,32 +84,43 @@ public class PluginConfig extends Skyoconfig {
 	 *
 	 * @return The corresponding list.
 	 */
-
-	public List<String> getStructures(final Material material) {
-		switch (material) {
-			case OAK_SAPLING: // Oak
+	// https://jd.papermc.io/paper/1.21.8/org/bukkit/TreeType.html
+	public List<String> getStructures(final TreeType treeType) {
+		switch (treeType) {
+			// Oak
+			case OAK_SAPLING: 
 			case OAK_LOG:
 				return saplingOakStructures;
-			case SPRUCE_SAPLING: // Spruce
+			// Spruce
+			case SPRUCE_SAPLING: 
 			case SPRUCE_LOG:
 				return saplingSpruceStructures;
-			case BIRCH_SAPLING: // Birch
+			// Birch
+			case BIRCH_SAPLING: 
 			case BIRCH_LOG:
 				return saplingBirchStructures;
-			case JUNGLE_SAPLING: // Jungle
+			// Jungle
+			case JUNGLE_SAPLING:
 			case JUNGLE_LOG:
 				return saplingJungleStructures;
-			case ACACIA_SAPLING: // Acacia
-			case ACACIA_LOG:
+			// Acacia
+			case ACACIA:
 				return saplingAcaciaStructures;
-			case DARK_OAK_SAPLING: // Dark Oak
+			// Dark Oak
+			case DARK_OAK_SAPLING:
 			case DARK_OAK_LOG:
 				return saplingDarkOakStructures;
-			case RED_MUSHROOM: // Red mushroom
+			// Red mushroom
+			case RED_MUSHROOM:
 			case MUSHROOM_STEM:
 				return mushroomRedStructures;
-			case BROWN_MUSHROOM: // Brown mushroom
+			// Brown mushroom
+			case BROWN_MUSHROOM:
 				return mushroomBrownStructures;
+			// Tree with large roots which grows above lush caves
+			// ???
+			case AZALEA:
+				return null; // TODO
 			default:
 				return null;
 		}
