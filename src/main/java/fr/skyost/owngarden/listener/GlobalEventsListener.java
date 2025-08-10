@@ -2,13 +2,18 @@ package fr.skyost.owngarden.listener;
 
 import fr.skyost.owngarden.OwnGarden;
 
-import org.bukkit.ChatColor;
+import java.util.List;
+import java.util.Random;
+
 import org.bukkit.Location;
 import org.bukkit.TreeType;
+import org.bukkit.block.structure.Mirror;
+import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.StructureGrowEvent;
+import org.bukkit.structure.Structure;
 
 /**
  * Global events handled by the plugin.
@@ -35,33 +40,21 @@ public class GlobalEventsListener implements Listener {
         Location location = event.getLocation();
         TreeType treeType = event.getSpecies();
 
-        this.plugin.log(ChatColor.WHITE, location + " " + treeType);
-        
-        // val structures = plugin.pluginConfig!!.getStructures(location.block.type)
-        // if (plugin.worldEditOperations!!.growTree(structures, location)) {
-        // if (structures === plugin.pluginConfig!!.saplingDarkOakStructures) {
-        // val current = location.block
-        // for (blockFace in FACES) {
-        // val relative = current.getRelative(blockFace)
-        // if (relative.type == Material.DARK_OAK_SAPLING) {
-        // relative.type = Material.AIR
-        // }
-        // }
-        // }
+        this.plugin.log(location + " " + treeType);
+        List<Structure> structures = this.plugin.getOwnGardenConfig().getTreeTypeStructures(treeType);
+        this.plugin.log(location + " " + treeType + " " + structures.size() + " structures found");
 
-        // //event.getBlocks().clear();
-        // event.setCancelled(true);
+        if (structures.isEmpty()) {
+            this.plugin.log(location + " " + treeType + " nothing custom here");
+            return;
+        }
+
+        Structure randomStructure = structures.get(new Random().nextInt(structures.size()));
+
+        randomStructure.place(location, false, StructureRotation.NONE, Mirror.NONE, 0, 1, new Random());
+
+        event.getBlocks().clear();
+        event.setCancelled(true);
     }
 
-    // companion object {
-    // private val FACES = listOf(
-    // BlockFace.NORTH,
-    // BlockFace.NORTH_EAST,
-    // BlockFace.EAST,
-    // BlockFace.SOUTH_EAST,
-    // BlockFace.SOUTH,
-    // BlockFace.SOUTH_WEST,
-    // BlockFace.WEST,
-    // BlockFace.NORTH_WEST
-    // )
 }

@@ -4,12 +4,18 @@ import com.google.common.base.Joiner;
 import fr.skyost.owngarden.command.OwnGardenCommand;
 import fr.skyost.owngarden.config.PluginConfig;
 import fr.skyost.owngarden.listener.GlobalEventsListener;
+import io.papermc.paper.plugin.configuration.PluginMeta;
+
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import org.bukkit.TreeType;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.structure.Structure;
+import org.bukkit.structure.StructureManager;
+
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The OwnGarden plugin class.
@@ -24,45 +30,50 @@ public class OwnGarden extends JavaPlugin {
     public void onEnable() {
         try {
             /* CONFIGURATION : */
-            log(ChatColor.GOLD, "Loading the configuration...");
+            this.log("<gold>Loading the configuration...</gold>");
 
-            PluginConfig pluginConfig = new PluginConfig(this.getDataFolder());
-            this.config = pluginConfig;
+            this.config = new PluginConfig(this.getDataFolder());
             this.config.load();
-            log(ChatColor.GOLD, "Configuration loaded !");
+            this.log("<gold>Configuration loaded !</gold>");
 
-            /* EXTRACTING DEFAULT STRUCTURES IF NEEDED : */
-            File shematicsDirectory = new File(pluginConfig.structuresDirectory);
-            if (!shematicsDirectory.exists() || !shematicsDirectory.isDirectory()) {
-                shematicsDirectory.mkdirs();
+            /* CREATE STRUCTURES ROOT DIRECTORY : */
+            File structuresDirectory = new File(this.config.structuresDirectory);
+            if (!structuresDirectory.exists() || !structuresDirectory.isDirectory()) {
+                structuresDirectory.mkdirs();
             }
 
-            if (shematicsDirectory.list().length == 0) {
-                log(ChatColor.GOLD, "Extracting samples structures...");
-                extractSamples(shematicsDirectory);
-                log(ChatColor.GOLD, "Done !");
+            /* CREATE TREE TYPE STRUCTURES DIRECTORY : */
+            for (TreeType treeType : TreeType.values()) {
+                File treeTypeStructuresDirectory = this.config.getTreeStructuresDirectory(treeType);
+                if (!treeTypeStructuresDirectory.exists() || !treeTypeStructuresDirectory.isDirectory()) {
+                    treeTypeStructuresDirectory.mkdirs();
+                }
             }
 
-            /* TESTING STRUCTURES : */
-            // log(ChatColor.GOLD, "Testing structures...")
-            // val invalidStructures = worldEditOperations!!.testStructures()
-            // if (invalidStructures.isNotEmpty()) {
-            //     log(ChatColor.RED, "There are some invalid structures :")
-            //     for (invalidStructure in invalidStructures) {
-            //         log(ChatColor.RED, invalidStructure)
-            //         pluginConfig.saplingOakStructures.remove(invalidStructure)
-            //         pluginConfig.saplingSpruceStructures.remove(invalidStructure)
-            //         pluginConfig.saplingBirchStructures.remove(invalidStructure)
-            //         pluginConfig.saplingJungleStructures.remove(invalidStructure)
-            //         pluginConfig.saplingAcaciaStructures.remove(invalidStructure)
-            //         pluginConfig.saplingDarkOakStructures.remove(invalidStructure)
-            //         pluginConfig.mushroomBrownStructures.remove(invalidStructure)
-            //         pluginConfig.mushroomRedStructures.remove(invalidStructure)
-            //     }
-            //     log(ChatColor.RED, "They are not going to be used by the plugin. Please fix them and restart your server.")
-            // } else {
-            //     log(ChatColor.GOLD, "Done, no error.")
-            // }
+            /* LOAD CUSTOM TREE TYPE STRUCTURES : */
+            StructureManager structureManager = this.getServer().getStructureManager();
+            for (TreeType treeType : TreeType.values()) {
+                File treeTypeStructuresDirectory = this.config.getTreeStructuresDirectory(treeType);
+                List<Structure> structures = new ArrayList<>();
+
+                for (File structureFile : treeTypeStructuresDirectory.listFiles()) {
+                    if (structureFile.isDirectory()) {
+                        continue;
+                    }
+
+                    try {
+                        Structure structure = structureManager.loadStructure(structureFile);
+                        structures.add(structure);
+                        this.log("<gold>Custom tree structure loaded</gold> " + structureFile);
+                    } catch (Exception e) {
+                        this.log("<red>Unable to load structure</red> " + structureFile);
+                    }
+                }
+
+                this.config.setTreeTypeStructures(treeType, structures);
+                this.log(structures.size() + " <gold>custom tree structures loaded for</gold> "
+                        + this.config.getTreeTypeName(treeType));
+            }
 
             /* REGISTERING EVENTS : */
             Bukkit.getPluginManager().registerEvents(new GlobalEventsListener(this), this);
@@ -70,43 +81,36 @@ public class OwnGarden extends JavaPlugin {
             /* REGISTERING COMMANDS : */
             getCommand("owngarden").setExecutor(new OwnGardenCommand(this));
 
-            PluginDescriptionFile description = this.getDescription();
-            log(ChatColor.RESET, "Enabled " + ChatColor.GREEN + description.getName() + " v" + description.getVersion() + ChatColor.GOLD + " by " + Joiner.on(' ').join(description.getAuthors()) + ChatColor.RESET + " !");
+            PluginMeta pluginMeta = this.getPluginMeta();
+            this.log("<gold>Enabled</gold> <green>" + pluginMeta.getName() + " v" + pluginMeta.getVersion() + "</green> <gold>by</gold> "
+                    + Joiner.on("<gold>, </gold>").join(pluginMeta.getAuthors()) + " <gold>!</gold>");
         } catch (Exception e) {
-            log(ChatColor.RED, "Unable to start the plugin !");
+            this.log("<red>Unable to start the plugin !</red>");
             e.printStackTrace();
         }
     }
 
     /**
-     * Extracts the samples to the specified directory.
+     * Logs a message to the console.
      *
-     * @param structuresDirectory The structures directory.
+     * @param color   The color (after the [plugin-name]).
+     * @param message The message.
+     * @param sender  The sender.
      */
-    private final void extractSamples(File structuresDirectory) {
-        // ZipUtil.unpack(file, structuresDirectory) { name: String -> if (name.startsWith("structures/")) name.replaceFirst("structures/".toRegex(), "") else null }
+    public final void log(String message) {
+        this.log(message, Bukkit.getConsoleSender());
     }
 
     /**
      * Logs a message to the console.
      *
-     * @param color The color (after the [plugin-name]).
+     * @param color   The color (after the [plugin-name]).
      * @param message The message.
-     * @param sender The sender.
+     * @param sender  The sender.
      */
-    public final void log(ChatColor color, String message) {
-        Bukkit.getConsoleSender().sendMessage("[" + this.getDescription().getName() + "] " + color + message);
-    }
-
-    /**
-     * Logs a message to the console.
-     *
-     * @param color The color (after the [plugin-name]).
-     * @param message The message.
-     * @param sender The sender.
-     */
-    public final void log(ChatColor color, String message, CommandSender sender) {
-        sender.sendMessage("[" + this.getDescription().getName() + "] " + color + message);
+    public final void log(String message, CommandSender sender) {
+        PluginMeta pluginMeta = this.getPluginMeta();
+        sender.sendRichMessage("<green>[" + pluginMeta.getName() + "]</green> " + message);
     }
 
     public final PluginConfig getOwnGardenConfig() {

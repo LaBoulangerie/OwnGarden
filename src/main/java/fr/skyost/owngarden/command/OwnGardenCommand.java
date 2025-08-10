@@ -3,13 +3,16 @@ package fr.skyost.owngarden.command;
 import com.google.common.base.Joiner;
 import fr.skyost.owngarden.OwnGarden;
 import fr.skyost.owngarden.config.PluginConfig;
+import io.papermc.paper.plugin.configuration.PluginMeta;
 
-import org.bukkit.ChatColor;
+import java.util.List;
+
+import org.bukkit.TreeType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
-import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.structure.Structure;
 import org.bukkit.util.ChatPaginator;
 
 /**
@@ -26,43 +29,47 @@ public class OwnGardenCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("owngarden.command")) {
-            this.plugin.log(ChatColor.RED, "You do not have the permission to execute this command.", sender);
+            this.plugin.log("<red>You do not have the permission to execute this command.</red>", sender);
             return true;
         }
 
-        PluginDescriptionFile description = this.plugin.getDescription();
-        sender.sendMessage(ChatColor.GREEN.toString() + description.getName() + " v" + description.getVersion() + ChatColor.GOLD + " by " + Joiner.on(' ').join(description.getAuthors()));
+        PluginMeta pluginMeta = this.plugin.getPluginMeta();
+
+        this.plugin.log("<gold>Enabled</gold> <green>" + pluginMeta.getName() + " v" + pluginMeta.getVersion()
+                + "</green> <gold>by</gold> "
+                + Joiner.on("<gold>, </gold>").join(pluginMeta.getAuthors()) + " <gold>!</gold>", sender);
+
         StringBuilder builder = new StringBuilder();
 
         for (int i = 0; i < ChatPaginator.GUARANTEED_NO_WRAP_CHAT_PAGE_WIDTH - 2; i++) {
             builder.append("=");
         }
+        String line = builder.toString();
+        sender.sendMessage(line);
 
         PluginConfig config = this.plugin.getOwnGardenConfig();
 
-        String line = builder.toString();
-        sender.sendMessage(ChatColor.RESET.toString() + line);
-        sender.sendMessage(ChatColor.GOLD.toString() + "STRUCTURES : ");
-        sender.sendMessage(ChatColor.RESET.toString() + "" + ChatColor.BOLD + "- Oak : " + ChatColor.RESET + Joiner.on(' ').join(config.saplingOakStructures));
-        sender.sendMessage(ChatColor.BOLD.toString() + "- Spruce : " + ChatColor.RESET + Joiner.on(' ').join(config.saplingSpruceStructures));
-        sender.sendMessage(ChatColor.BOLD.toString() + "- Jungle : " + ChatColor.RESET + Joiner.on(' ').join(config.saplingJungleStructures));
-        sender.sendMessage(ChatColor.BOLD.toString() + "- Acacia : " + ChatColor.RESET + Joiner.on(' ').join(config.saplingAcaciaStructures));
-        sender.sendMessage(ChatColor.BOLD.toString() + "- Dark Oak : " + ChatColor.RESET + Joiner.on(' ').join(config.saplingDarkOakStructures));
-        sender.sendMessage(ChatColor.BOLD.toString() + "- Brown Mushroom : " + ChatColor.RESET + Joiner.on(' ').join(config.mushroomBrownStructures));
-        sender.sendMessage(ChatColor.BOLD.toString() + "- Red Mushroom : " + ChatColor.RESET + Joiner.on(' ').join(config.mushroomRedStructures));
-        sender.sendMessage(line);
-        sender.sendMessage(ChatColor.GOLD.toString() + "PERMISSIONS : ");
+        this.plugin.log("<gold>STRUCTURES : </gold>", sender);
+        for (TreeType treeType : TreeType.values()) {
+            List<Structure> structures = config.getTreeTypeStructures(treeType);
+            sender.sendRichMessage(
+                    " <gold>+</gold> " + structures.size() + " <gold>custom tree structures loaded for</gold> "
+                            + config.getTreeTypeName(treeType));
+        }
 
-        for (Permission permission: description.getPermissions()) {
+        sender.sendMessage(line);
+        this.plugin.log("<gold>PERMISSIONS : </gold>", sender);
+
+        for (Permission permission : pluginMeta.getPermissions()) {
             if (sender.hasPermission(permission)) {
-                sender.sendMessage(ChatColor.GREEN.toString() + "- You have the permission " + ChatColor.BOLD + permission.getName() + ChatColor.RESET + ChatColor.GREEN + ".");
+                sender.sendRichMessage("<green>- You have the permission <b>" + permission.getName() + "</b>.</green>");
             } else {
-                sender.sendMessage(ChatColor.RED.toString() + "- You do not have the permission " + ChatColor.BOLD + permission.getName() + ChatColor.RESET + ChatColor.RED + ".");
+                sender.sendRichMessage(
+                        "<red>- You do not have the permission <b>" + permission.getName() + "</b>.</red>");
             }
         }
 
-        sender.sendMessage(ChatColor.RESET.toString() + line);
-        sender.sendMessage(ChatColor.AQUA.toString() + "" + ChatColor.ITALIC + "The above list is scrollable.");
+        sender.sendMessage(line);
         return true;
     }
 }
