@@ -20,6 +20,8 @@ import org.bukkit.structure.Structure;
  */
 public class GlobalEventsListener implements Listener {
 
+    private static final Random RANDOM = new Random();
+
     private final OwnGarden plugin;
 
     public GlobalEventsListener(OwnGarden plugin) {
@@ -49,9 +51,17 @@ public class GlobalEventsListener implements Listener {
             return;
         }
 
-        Structure randomStructure = structures.get(new Random().nextInt(structures.size()));
+        Structure randomStructure = structures.get(RANDOM.nextInt(structures.size()));
 
-        randomStructure.place(location, false, StructureRotation.NONE, Mirror.NONE, 0, 1, new Random());
+        StructureRotation rotation = StructureRotation.NONE;
+        Mirror mirror = Mirror.NONE;
+        if (this.plugin.getOwnGardenConfig().structuresRandomRotation) {
+            rotation = StructureRotation.values()[RANDOM.nextInt(StructureRotation.values().length)];
+            mirror = Mirror.values()[RANDOM.nextInt(Mirror.values().length)];
+        }
+
+        randomStructure.place(location, false,
+                rotation, mirror, -1, 1, RANDOM);
 
         event.getBlocks().clear();
         event.setCancelled(true);
