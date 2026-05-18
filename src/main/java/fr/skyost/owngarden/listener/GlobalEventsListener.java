@@ -2,6 +2,8 @@ package fr.skyost.owngarden.listener;
 
 import fr.skyost.owngarden.OwnGarden;
 import fr.skyost.owngarden.config.PluginConfig.HeightCheckFailBehavior;
+import fr.skyost.owngarden.model.DecorationPattern;
+import fr.skyost.owngarden.util.DecorationPlacer;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -235,6 +237,18 @@ public class GlobalEventsListener implements Listener {
         randomStructure.place(centeredLocation, false,
                 rotation, mirror, -1, 1, RANDOM,
                 blockTransformers, Collections.emptyList());
+
+        // Place decorations if configured
+        List<DecorationPattern> decorationPatterns = this.plugin.getOwnGardenConfig()
+                .getDecorationPatterns(treeType, biome);
+        if (!decorationPatterns.isEmpty()) {
+            Location decorationCenter = is2x2 && origin2x2 != null
+                    ? origin2x2.clone().add(0.5, 0, 0.5)
+                    : location.clone();
+            for (DecorationPattern decorationPattern : decorationPatterns) {
+                DecorationPlacer.placeDecorations(decorationCenter, decorationPattern, is2x2);
+            }
+        }
 
         event.getBlocks().clear();
         event.setCancelled(true);

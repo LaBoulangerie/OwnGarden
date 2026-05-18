@@ -1,0 +1,246 @@
+# OwnGarden Configuration
+
+structures:
+  directory: "plugins/OwnGarden/structures"
+  random-rotation: true
+  height-check:
+    enabled: true
+    on-fail:
+      oak: CANCEL
+      big_oak: CANCEL
+      spruce: CANCEL
+      birch: CANCEL
+      jungle: CANCEL
+      acacia: CANCEL
+      dark_oak: CANCEL
+      mega_redwood: CANCEL
+      small_jungle: CANCEL
+      brown_mushroom: CANCEL
+      red_mushroom: CANCEL
+  biome-groups:
+    forest: [FOREST, FLOWER_FOREST, BIRCH_FOREST, OLD_GROWTH_BIRCH_FOREST, DARK_FOREST, PALE_GARDEN, CHERRY_GROVE]
+    plains: [PLAINS, SUNFLOWER_PLAINS, MEADOW]
+    cold: [TAIGA, OLD_GROWTH_PINE_TAIGA, OLD_GROWTH_SPRUCE_TAIGA, SNOWY_TAIGA, SNOWY_PLAINS, SNOWY_BEACH, SNOWY_SLOPES, ICE_SPIKES, FROZEN_PEAKS, FROZEN_OCEAN, DEEP_FROZEN_OCEAN, FROZEN_RIVER, GROVE]
+    jungle: [JUNGLE, SPARSE_JUNGLE, BAMBOO_JUNGLE]
+    savanna: [SAVANNA, SAVANNA_PLATEAU, WINDSWEPT_SAVANNA]
+    swamp: [SWAMP, MANGROVE_SWAMP]
+    hot: [DESERT, BADLANDS, WOODED_BADLANDS, ERODED_BADLANDS]
+    mountains: [WINDSWEPT_HILLS, WINDSWEPT_FOREST, WINDSWEPT_GRAVELLY_HILLS, JAGGED_PEAKS, STONY_PEAKS]
+    nether: [NETHER_WASTES, SOUL_SAND_VALLEY, CRIMSON_FOREST, WARPED_FOREST, BASALT_DELTAS]
+    end: [THE_END, SMALL_END_ISLANDS, END_MIDLANDS, END_HIGHLANDS, END_BARRENS]
+
+# Decoration patterns definition
+decoration-patterns:
+  # Generic reusable patterns
+  grass-basic:
+    min-radius: 2
+    max-radius: 4
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, PODZOL, COARSE_DIRT, ROOTED_DIRT, MUD]
+    blocks:
+      - {material: SHORT_GRASS, chance: 0.25}
+      - {material: TALL_GRASS, chance: 0.12, height: 2}
+      - {material: FERN, chance: 0.08}
+
+  mushroom-sparse:
+    min-radius: 2
+    max-radius: 4
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, PODZOL, COARSE_DIRT, ROOTED_DIRT, MUD]
+    blocks:
+      - {material: RED_MUSHROOM, chance: 0.03}
+      - {material: BROWN_MUSHROOM, chance: 0.04}
+
+  dead-vegetation:
+    min-radius: 2
+    max-radius: 4
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, SAND, RED_SAND, COARSE_DIRT]
+    blocks:
+      - {material: DEAD_BUSH, chance: 0.15}
+      - {material: SHORT_GRASS, chance: 0.05}
+
+  # Birch patterns
+  birch-meadow:
+    min-radius: 2
+    max-radius: 4
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, PODZOL]
+    blocks:
+      - {material: SHORT_GRASS, chance: 0.3}
+      - {material: TALL_GRASS, chance: 0.15, height: 2}
+      - {material: "minecraft:wildflowers[flower_amount=1]", chance: 0.1, random-rotation: true}
+      - {material: "minecraft:wildflowers[flower_amount=2]", chance: 0.08, random-rotation: true}
+      - {material: "minecraft:wildflowers[flower_amount=3]", chance: 0.05, random-rotation: true}
+      - {material: "minecraft:wildflowers[flower_amount=4]", chance: 0.03, random-rotation: true}
+      - {material: DANDELION, chance: 0.05}
+      - {material: OXEYE_DAISY, chance: 0.04}
+      - {material: AZURE_BLUET, chance: 0.03}
+
+  birch-forest:
+    min-radius: 2
+    max-radius: 4
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, PODZOL, COARSE_DIRT, ROOTED_DIRT, MUD]
+    blocks:
+      - {material: SHORT_GRASS, chance: 0.35}
+      - {material: TALL_GRASS, chance: 0.15, height: 2}
+      - {material: FERN, chance: 0.1}
+      - {material: LILY_OF_THE_VALLEY, chance: 0.05}
+
+  # Oak patterns
+  oak-forest:
+    min-radius: 2
+    max-radius: 4
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, PODZOL, COARSE_DIRT, ROOTED_DIRT, MUD]
+    blocks:
+      - {material: SHORT_GRASS, chance: 0.3}
+      - {material: TALL_GRASS, chance: 0.12, height: 2}
+      - {material: FERN, chance: 0.08}
+      - {material: POPPY, chance: 0.04}
+      - {material: DANDELION, chance: 0.04}
+      - {material: BLUE_ORCHID, chance: 0.02}
+
+  oak-plains:
+    min-radius: 2
+    max-radius: 4
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, PODZOL, COARSE_DIRT, ROOTED_DIRT, MUD]
+    blocks:
+      - {material: SHORT_GRASS, chance: 0.4}
+      - {material: TALL_GRASS, chance: 0.1, height: 2}
+      - {material: DANDELION, chance: 0.08}
+      - {material: POPPY, chance: 0.06}
+      - {material: CORNFLOWER, chance: 0.04}
+      - {material: OXEYE_DAISY, chance: 0.03}
+
+  # Spruce patterns
+  spruce-taiga:
+    min-radius: 2
+    max-radius: 4
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, PODZOL, COARSE_DIRT, ROOTED_DIRT, MUD]
+    blocks:
+      - {material: FERN, chance: 0.25}
+      - {material: LARGE_FERN, chance: 0.12, height: 2}
+      - {material: SHORT_GRASS, chance: 0.15}
+      - {material: BROWN_MUSHROOM, chance: 0.04}
+      - {material: RED_MUSHROOM, chance: 0.02}
+
+  spruce-cold:
+    min-radius: 2
+    max-radius: 4
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, PODZOL, COARSE_DIRT, ROOTED_DIRT, MUD]
+    blocks:
+      - {material: SHORT_GRASS, chance: 0.15}
+      - {material: FERN, chance: 0.1}
+      - {material: SWEET_BERRY_BUSH, chance: 0.03}
+
+  # Jungle patterns
+  jungle-tropical:
+    min-radius: 2
+    max-radius: 5
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, PODZOL, COARSE_DIRT, ROOTED_DIRT, MUD]
+    blocks:
+      - {material: FERN, chance: 0.3}
+      - {material: LARGE_FERN, chance: 0.2, height: 2}
+      - {material: SHORT_GRASS, chance: 0.2}
+      - {material: TALL_GRASS, chance: 0.1, height: 2}
+      - {material: "minecraft:wildflowers[flower_amount=3]", chance: 0.05, random-rotation: true}
+      - {material: BLUE_ORCHID, chance: 0.03}
+
+  jungle-sparse:
+    min-radius: 2
+    max-radius: 4
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, PODZOL, COARSE_DIRT, ROOTED_DIRT, MUD]
+    blocks:
+      - {material: FERN, chance: 0.2}
+      - {material: LARGE_FERN, chance: 0.1, height: 2}
+      - {material: SHORT_GRASS, chance: 0.15}
+
+  # Acacia patterns
+  acacia-savanna:
+    min-radius: 2
+    max-radius: 4
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, COARSE_DIRT]
+    blocks:
+      - {material: SHORT_GRASS, chance: 0.25}
+      - {material: TALL_GRASS, chance: 0.2, height: 2}
+      - {material: DEAD_BUSH, chance: 0.08}
+
+  acacia-dry:
+    min-radius: 2
+    max-radius: 4
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, SAND, RED_SAND, COARSE_DIRT]
+    blocks:
+      - {material: DEAD_BUSH, chance: 0.15}
+      - {material: SHORT_GRASS, chance: 0.1}
+
+  # Dark Oak patterns
+  dark-oak-forest:
+    min-radius: 2
+    max-radius: 4
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, PODZOL, COARSE_DIRT, ROOTED_DIRT, MUD]
+    blocks:
+      - {material: FERN, chance: 0.2}
+      - {material: LARGE_FERN, chance: 0.1, height: 2}
+      - {material: SHORT_GRASS, chance: 0.15}
+      - {material: RED_MUSHROOM, chance: 0.06}
+      - {material: BROWN_MUSHROOM, chance: 0.08}
+
+  dark-oak-mushroom:
+    min-radius: 2
+    max-radius: 4
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, PODZOL, COARSE_DIRT, ROOTED_DIRT, MUD]
+    blocks:
+      - {material: BROWN_MUSHROOM, chance: 0.12}
+      - {material: RED_MUSHROOM, chance: 0.08}
+
+# Tree type -> biome group -> pattern(s) mapping
+decorations:
+  birch:
+    default: birch-meadow
+    forest: birch-forest
+    plains: birch-meadow
+  oak:
+    default: oak-forest
+    forest: oak-forest
+    plains: oak-plains
+  spruce:
+    default: spruce-taiga
+    cold: spruce-cold
+  jungle:
+    default: jungle-tropical
+    jungle: jungle-tropical
+  small_jungle:
+    default: jungle-sparse
+  acacia:
+    default: acacia-savanna
+    savanna: acacia-savanna
+    hot: acacia-dry
+  dark_oak:
+    default: dark-oak-forest,mushroom-sparse
+    forest: dark-oak-forest
