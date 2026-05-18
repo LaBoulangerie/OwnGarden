@@ -237,7 +237,7 @@ public class Skyoconfig {
 				final Object value = section.get(key);
 				unserializedMap.put(key, deserializeObject(value.getClass(), value));
 			}
-			final Object map = clazz.newInstance();
+			final Object map = clazz.getDeclaredConstructor().newInstance();
 			clazz.getMethod("putAll", Map.class).invoke(map, unserializedMap);
 			return map;
 		}
