@@ -4,7 +4,7 @@ description: Grow custom trees !
 version: 0.3.0
 authors: [Skyost, LaBoulangerie, Clem]
 website: https://github.com/LaBoulangerie/OwnGarden
-api-version: 1.21
+api-version: 1.21.11
 commands:
   owngarden:
     description: Main command of OwnGarden.
@@ -16,3 +16,6 @@ permissions:
   owngarden.command:
     default: op
     description: Allows you to use /owngarden.
+  owngarden.reload:
+    default: op
+    description: Allows you to reload the configuration and structures.

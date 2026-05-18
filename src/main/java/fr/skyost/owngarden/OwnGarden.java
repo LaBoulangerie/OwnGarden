@@ -48,38 +48,63 @@ public class OwnGarden extends JavaPlugin {
                 if (!treeTypeStructuresDirectory.exists() || !treeTypeStructuresDirectory.isDirectory()) {
                     treeTypeStructuresDirectory.mkdirs();
                 }
+
+                // Create default subdirectory
+                File defaultDir = new File(treeTypeStructuresDirectory, "default");
+                if (!defaultDir.exists()) {
+                    defaultDir.mkdirs();
+                }
+
+                // Create biome group subdirectories
+                for (String biomeGroup : this.config.structuresBiomeGroups.keySet()) {
+                    File biomeGroupDir = new File(treeTypeStructuresDirectory, biomeGroup);
+                    if (!biomeGroupDir.exists()) {
+                        biomeGroupDir.mkdirs();
+                    }
+                }
             }
 
             /* LOAD CUSTOM TREE TYPE STRUCTURES : */
             StructureManager structureManager = this.getServer().getStructureManager();
             for (TreeType treeType : TreeType.values()) {
                 File treeTypeStructuresDirectory = this.config.getTreeStructuresDirectory(treeType);
-                List<Structure> structures = new ArrayList<>();
+                int totalStructures = 0;
 
-                for (File structureFile : treeTypeStructuresDirectory.listFiles()) {
-                    if (structureFile.isDirectory()) {
-                        continue;
-                    }
+                // Load structures from root directory as "default"
+                List<Structure> defaultStructures = loadStructuresFromDirectory(structureManager, treeTypeStructuresDirectory);
+                if (!defaultStructures.isEmpty()) {
+                    this.config.setTreeTypeStructures(treeType, "default", defaultStructures);
+                    totalStructures += defaultStructures.size();
+                }
 
-                    try {
-                        Structure structure = structureManager.loadStructure(structureFile);
-                        structures.add(structure);
-                        this.log("<gold>Custom tree structure loaded</gold> " + structureFile);
-                    } catch (Exception e) {
-                        this.log("<red>Unable to load structure</red> " + structureFile);
+                // Load structures from biome group subdirectories
+                File[] subdirectories = treeTypeStructuresDirectory.listFiles(File::isDirectory);
+                if (subdirectories != null) {
+                    for (File biomeGroupDir : subdirectories) {
+                        String biomeGroup = biomeGroupDir.getName().toLowerCase();
+                        List<Structure> biomeStructures = loadStructuresFromDirectory(structureManager, biomeGroupDir);
+                        if (!biomeStructures.isEmpty()) {
+                            this.config.setTreeTypeStructures(treeType, biomeGroup, biomeStructures);
+                            totalStructures += biomeStructures.size();
+                            this.log("<gold>Loaded</gold> " + biomeStructures.size() + " <gold>structures for</gold> "
+                                    + this.config.getTreeTypeName(treeType) + "/" + biomeGroup);
+                        }
                     }
                 }
 
-                this.config.setTreeTypeStructures(treeType, structures);
-                this.log(structures.size() + " <gold>custom tree structures loaded for</gold> "
-                        + this.config.getTreeTypeName(treeType));
+                if (totalStructures > 0) {
+                    this.log(totalStructures + " <gold>total custom tree structures loaded for</gold> "
+                            + this.config.getTreeTypeName(treeType));
+                }
             }
 
             /* REGISTERING EVENTS : */
             Bukkit.getPluginManager().registerEvents(new GlobalEventsListener(this), this);
 
             /* REGISTERING COMMANDS : */
-            getCommand("owngarden").setExecutor(new OwnGardenCommand(this));
+            OwnGardenCommand commandExecutor = new OwnGardenCommand(this);
+            getCommand("owngarden").setExecutor(commandExecutor);
+            getCommand("owngarden").setTabCompleter(commandExecutor);
 
             PluginMeta pluginMeta = this.getPluginMeta();
             this.log("<gold>Enabled</gold> <green>" + pluginMeta.getName() + " v" + pluginMeta.getVersion() + "</green> <gold>by</gold> "
@@ -115,5 +140,86 @@ public class OwnGarden extends JavaPlugin {
 
     public final PluginConfig getOwnGardenConfig() {
         return config;
+    }
+
+    /**
+     * Reloads the plugin configuration and all structures.
+     *
+     * @return the number of structures loaded, or -1 if reload failed
+     */
+    public int reloadStructures() {
+        // Reload the configuration file
+        try {
+            config.load();
+        } catch (Exception e) {
+            this.log("<red>Failed to reload configuration: " + e.getMessage() + "</red>");
+            e.printStackTrace();
+            return -1;
+        }
+
+        // Clear the loaded structures cache
+        config.clearLoadedStructures();
+
+        // Reload all structures
+        int totalLoadedStructures = 0;
+        StructureManager structureManager = this.getServer().getStructureManager();
+        for (TreeType treeType : TreeType.values()) {
+            File treeTypeStructuresDirectory = this.config.getTreeStructuresDirectory(treeType);
+            int totalStructures = 0;
+
+            // Load structures from root directory as "default"
+            List<Structure> defaultStructures = loadStructuresFromDirectory(structureManager, treeTypeStructuresDirectory);
+            if (!defaultStructures.isEmpty()) {
+                this.config.setTreeTypeStructures(treeType, "default", defaultStructures);
+                totalStructures += defaultStructures.size();
+            }
+
+            // Load structures from biome group subdirectories
+            File[] subdirectories = treeTypeStructuresDirectory.listFiles(File::isDirectory);
+            if (subdirectories != null) {
+                for (File biomeGroupDir : subdirectories) {
+                    String biomeGroup = biomeGroupDir.getName().toLowerCase();
+                    List<Structure> biomeStructures = loadStructuresFromDirectory(structureManager, biomeGroupDir);
+                    if (!biomeStructures.isEmpty()) {
+                        this.config.setTreeTypeStructures(treeType, biomeGroup, biomeStructures);
+                        totalStructures += biomeStructures.size();
+                    }
+                }
+            }
+
+            if (totalStructures > 0) {
+                this.log(totalStructures + " <gold>total custom tree structures loaded for</gold> "
+                        + this.config.getTreeTypeName(treeType));
+            }
+            totalLoadedStructures += totalStructures;
+        }
+        return totalLoadedStructures;
+    }
+
+    /**
+     * Loads all structure files from a directory.
+     */
+    private List<Structure> loadStructuresFromDirectory(StructureManager structureManager, File directory) {
+        List<Structure> structures = new ArrayList<>();
+        File[] files = directory.listFiles();
+        if (files == null) {
+            return structures;
+        }
+
+        for (File structureFile : files) {
+            if (structureFile.isDirectory()) {
+                continue;
+            }
+
+            try {
+                Structure structure = structureManager.loadStructure(structureFile);
+                structures.add(structure);
+                this.log("<gold>Custom tree structure loaded</gold> " + structureFile);
+            } catch (Exception e) {
+                this.log("<red>Unable to load structure</red> " + structureFile);
+            }
+        }
+
+        return structures;
     }
 }
