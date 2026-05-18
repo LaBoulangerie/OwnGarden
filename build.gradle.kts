@@ -3,6 +3,8 @@ plugins {
   id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
+version = "1.0.1"
+
 repositories {
   maven {
     name = "papermc"
@@ -21,6 +23,17 @@ java {
 }
 
 tasks {
+  processResources {
+    filesMatching("plugin.yml") {
+      expand("version" to project.version)
+    }
+  }
+
+  jar {
+    archiveBaseName.set("owngarden")
+    archiveVersion.set(project.version.toString())
+  }
+
   runServer {
     minecraftVersion("1.21.11")
   }

@@ -75,6 +75,17 @@ public class OwnGardenCommand implements CommandExecutor, TabCompleter {
         }
 
         sender.sendMessage(line);
+        this.plugin.log("<gold>DECORATION PATTERNS : </gold>", sender);
+        List<String> patternNames = config.getDecorationPatternNames();
+        if (patternNames.isEmpty()) {
+            sender.sendRichMessage(" <gray>No decoration patterns loaded</gray>");
+        } else {
+            for (String patternName : patternNames) {
+                sender.sendRichMessage(" <gold>+</gold> " + patternName);
+            }
+        }
+
+        sender.sendMessage(line);
         this.plugin.log("<gold>PERMISSIONS : </gold>", sender);
 
         for (Permission permission : pluginMeta.getPermissions()) {
