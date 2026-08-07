@@ -52,12 +52,9 @@ public class GlobalEventsListener implements Listener {
         TreeType treeType = event.getSpecies();
         Biome biome = location.getBlock().getBiome();
 
-        this.plugin.log(location + " " + treeType + " in biome " + biome);
         List<Structure> structures = this.plugin.getOwnGardenConfig().getTreeTypeStructures(treeType, biome);
-        this.plugin.log(location + " " + treeType + " " + structures.size() + " structures found for biome " + biome);
 
         if (structures.isEmpty()) {
-            this.plugin.log(location + " " + treeType + " nothing custom here");
             return;
         }
 
@@ -71,10 +68,8 @@ public class GlobalEventsListener implements Listener {
         if (is2x2) {
             origin2x2 = find2x2Origin(location, saplingType);
             if (origin2x2 == null) {
-                this.plugin.log(location + " " + treeType + " 2x2 pattern not found, should not happen");
                 return;
             }
-            this.plugin.log(location + " " + treeType + " 2x2 origin at " + origin2x2);
         }
 
         // Height check location: center of 2x2 pattern or sapling location
@@ -93,7 +88,6 @@ public class GlobalEventsListener implements Listener {
                     for (int dz = -checkRadius; dz <= checkRadius; dz++) {
                         Block block = heightCheckLocation.clone().add(dx, y, dz).getBlock();
                         if (!isBlockReplaceable(block.getType())) {
-                            this.plugin.log("Blocked by " + block.getType() + " at offset (" + dx + ", " + y + ", " + dz + ")");
                             hasSpace = false;
                             break outerLoop;
                         }
@@ -103,8 +97,6 @@ public class GlobalEventsListener implements Listener {
 
             if (!hasSpace) {
                 HeightCheckFailBehavior behavior = this.plugin.getOwnGardenConfig().getHeightCheckFailBehavior(treeType);
-                int checkSize = (checkRadius * 2 + 1);
-                this.plugin.log("Not enough space (" + checkSize + "x" + checkSize + ") for structure. Behavior: " + behavior);
 
                 if (behavior == HeightCheckFailBehavior.CANCEL) {
                     event.setCancelled(true);
@@ -185,8 +177,6 @@ public class GlobalEventsListener implements Listener {
             if (offsetZ > 0) offsetZ--;
 
             centeredLocation = centerLocation.clone().subtract(offsetX, 0, offsetZ);
-
-            this.plugin.log("2x2 offset: (" + offsetX + "," + offsetZ + ") [center=" + centerX + ", size=" + sizeX + "x" + sizeZ + "]");
         } else {
             // Pour les arbres 1x1 : garder le code existant qui fonctionne
             int offsetX, offsetZ;
@@ -226,10 +216,6 @@ public class GlobalEventsListener implements Listener {
 
             centeredLocation = centerLocation.clone().subtract(offsetX, 0, offsetZ);
         }
-
-        this.plugin.log("Structure size: " + sizeX + "x" + sizeZ + ", rotation: " + rotation + ", mirror: " + mirror);
-        this.plugin.log("Center at: " + centerLocation.getBlockX() + ", " + centerLocation.getBlockZ() + (is2x2 ? " (2x2 center)" : " (sapling)"));
-        this.plugin.log("Placing at: " + centeredLocation.getBlockX() + ", " + centeredLocation.getBlockZ());
 
         Collection<BlockTransformer> blockTransformers = createBlockTransformers();
         randomStructure.place(centeredLocation, false,

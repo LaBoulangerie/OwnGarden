@@ -3,6 +3,8 @@ plugins {
   id("xyz.jpenilla.run-paper") version "2.3.1"
 }
 
+version = "1.0.1"
+
 repositories {
   maven {
     name = "papermc"
