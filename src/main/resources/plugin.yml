@@ -1,8 +1,8 @@
 name: OwnGarden
 main: fr.skyost.owngarden.OwnGarden
 description: Grow custom trees !
-version: 0.3.0
-authors: [Skyost, LaBoulangerie, Clem]
+version: ${version}
+authors: [Skyost, LaBoulangerie, Clem, Red69_Leaf]
 website: https://github.com/LaBoulangerie/OwnGarden
 api-version: 1.21.11
 commands:

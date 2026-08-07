@@ -32,8 +32,12 @@ public class OwnGarden extends JavaPlugin {
             /* CONFIGURATION : */
             this.log("<gold>Loading the configuration...</gold>");
 
+            // Copy default config.yml from resources if it doesn't exist
+            saveDefaultConfig();
+
             this.config = new PluginConfig(this.getDataFolder());
             this.config.load();
+            this.config.loadDecorationPatterns();
             this.log("<gold>Configuration loaded !</gold>");
 
             /* CREATE STRUCTURES ROOT DIRECTORY : */
@@ -151,6 +155,7 @@ public class OwnGarden extends JavaPlugin {
         // Reload the configuration file
         try {
             config.load();
+            config.loadDecorationPatterns();
         } catch (Exception e) {
             this.log("<red>Failed to reload configuration: " + e.getMessage() + "</red>");
             e.printStackTrace();

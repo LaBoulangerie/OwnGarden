@@ -230,12 +230,22 @@ public class Skyoconfig {
 		if(clazz.isEnum() || object instanceof Enum<?>) {
 			return Enum.valueOf((Class<? extends Enum>)clazz, object.toString());
 		}
-		if(Map.class.isAssignableFrom(clazz) || object instanceof Map) {
+		// Handle ConfigurationSection (Bukkit's representation of nested YAML objects)
+		if(object instanceof ConfigurationSection) {
 			final ConfigurationSection section = (ConfigurationSection)object;
 			final Map<Object, Object> unserializedMap = new HashMap<>();
 			for(final String key : section.getKeys(false)) {
 				final Object value = section.get(key);
 				unserializedMap.put(key, deserializeObject(value.getClass(), value));
+			}
+			return unserializedMap;
+		}
+		if(Map.class.isAssignableFrom(clazz) || object instanceof Map) {
+			final Map<?, ?> sourceMap = (Map<?, ?>)object;
+			final Map<Object, Object> unserializedMap = new HashMap<>();
+			for(final Map.Entry<?, ?> entry : sourceMap.entrySet()) {
+				final Object value = entry.getValue();
+				unserializedMap.put(entry.getKey(), deserializeObject(value.getClass(), value));
 			}
 			final Object map = clazz.getDeclaredConstructor().newInstance();
 			clazz.getMethod("putAll", Map.class).invoke(map, unserializedMap);

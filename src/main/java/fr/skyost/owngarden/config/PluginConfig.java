@@ -1,5 +1,7 @@
 package fr.skyost.owngarden.config;
 
+import fr.skyost.owngarden.model.DecorationBlock;
+import fr.skyost.owngarden.model.DecorationPattern;
 import fr.skyost.owngarden.util.Skyoconfig;
 
 import org.bukkit.TreeType;
@@ -8,9 +10,13 @@ import org.bukkit.structure.Structure;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * The plugin configuration.
@@ -33,8 +39,17 @@ public class PluginConfig extends Skyoconfig {
 	@ConfigOptions(name = "structures.biome-groups")
 	public HashMap<String, List<String>> structuresBiomeGroups = new HashMap<>();
 
+	@ConfigOptions(name = "decoration-patterns")
+	public HashMap<String, HashMap<String, Object>> decorationPatterns = new HashMap<>();
+
+	@ConfigOptions(name = "decorations")
+	public HashMap<String, HashMap<String, String>> decorations = new HashMap<>();
+
 	// TreeType -> (biomeGroup -> structures)
 	private HashMap<TreeType, HashMap<String, List<Structure>>> loadedTreeTypeStructures;
+
+	@ConfigOptions(ignore = true)
+	private HashMap<String, DecorationPattern> loadedDecorationPatterns = new HashMap<>();
 
 	/**
 	 * Creates a new plugin config instance.
@@ -55,100 +70,7 @@ public class PluginConfig extends Skyoconfig {
 
 		structuresDirectory = new File(dataFolder, "structures/").getPath();
 		this.loadedTreeTypeStructures = new HashMap<>();
-
-		// Default height check behavior for each tree type
-		structuresHeightCheckOnFail.put("oak", "VANILLA");
-		structuresHeightCheckOnFail.put("big_oak", "VANILLA");
-		structuresHeightCheckOnFail.put("spruce", "VANILLA");
-		structuresHeightCheckOnFail.put("birch", "VANILLA");
-		structuresHeightCheckOnFail.put("jungle", "VANILLA");
-		structuresHeightCheckOnFail.put("acacia", "VANILLA");
-		structuresHeightCheckOnFail.put("dark_oak", "VANILLA");
-		structuresHeightCheckOnFail.put("mega_redwood", "VANILLA");
-		structuresHeightCheckOnFail.put("small_jungle", "VANILLA");
-		structuresHeightCheckOnFail.put("brown_mushroom", "VANILLA");
-		structuresHeightCheckOnFail.put("red_mushroom", "VANILLA");
-
-		// Default biome groups
-		List<String> forestBiomes = new ArrayList<>();
-		forestBiomes.add("FOREST");
-		forestBiomes.add("FLOWER_FOREST");
-		forestBiomes.add("BIRCH_FOREST");
-		forestBiomes.add("OLD_GROWTH_BIRCH_FOREST");
-		forestBiomes.add("DARK_FOREST");
-		forestBiomes.add("PALE_GARDEN");
-		forestBiomes.add("CHERRY_GROVE");
-		structuresBiomeGroups.put("forest", forestBiomes);
-
-		List<String> plainsBiomes = new ArrayList<>();
-		plainsBiomes.add("PLAINS");
-		plainsBiomes.add("SUNFLOWER_PLAINS");
-		plainsBiomes.add("MEADOW");
-		structuresBiomeGroups.put("plains", plainsBiomes);
-
-		List<String> coldBiomes = new ArrayList<>();
-		coldBiomes.add("TAIGA");
-		coldBiomes.add("OLD_GROWTH_PINE_TAIGA");
-		coldBiomes.add("OLD_GROWTH_SPRUCE_TAIGA");
-		coldBiomes.add("SNOWY_TAIGA");
-		coldBiomes.add("SNOWY_PLAINS");
-		coldBiomes.add("SNOWY_BEACH");
-		coldBiomes.add("SNOWY_SLOPES");
-		coldBiomes.add("ICE_SPIKES");
-		coldBiomes.add("FROZEN_PEAKS");
-		coldBiomes.add("FROZEN_OCEAN");
-		coldBiomes.add("DEEP_FROZEN_OCEAN");
-		coldBiomes.add("FROZEN_RIVER");
-		coldBiomes.add("GROVE");
-		structuresBiomeGroups.put("cold", coldBiomes);
-
-		List<String> jungleBiomes = new ArrayList<>();
-		jungleBiomes.add("JUNGLE");
-		jungleBiomes.add("SPARSE_JUNGLE");
-		jungleBiomes.add("BAMBOO_JUNGLE");
-		structuresBiomeGroups.put("jungle", jungleBiomes);
-
-		List<String> savannaBiomes = new ArrayList<>();
-		savannaBiomes.add("SAVANNA");
-		savannaBiomes.add("SAVANNA_PLATEAU");
-		savannaBiomes.add("WINDSWEPT_SAVANNA");
-		structuresBiomeGroups.put("savanna", savannaBiomes);
-
-		List<String> swampBiomes = new ArrayList<>();
-		swampBiomes.add("SWAMP");
-		swampBiomes.add("MANGROVE_SWAMP");
-		structuresBiomeGroups.put("swamp", swampBiomes);
-
-		List<String> hotBiomes = new ArrayList<>();
-		hotBiomes.add("DESERT");
-		hotBiomes.add("BADLANDS");
-		hotBiomes.add("WOODED_BADLANDS");
-		hotBiomes.add("ERODED_BADLANDS");
-		structuresBiomeGroups.put("hot", hotBiomes);
-
-		List<String> mountainsBiomes = new ArrayList<>();
-		mountainsBiomes.add("WINDSWEPT_HILLS");
-		mountainsBiomes.add("WINDSWEPT_FOREST");
-		mountainsBiomes.add("WINDSWEPT_GRAVELLY_HILLS");
-		mountainsBiomes.add("JAGGED_PEAKS");
-		mountainsBiomes.add("STONY_PEAKS");
-		structuresBiomeGroups.put("mountains", mountainsBiomes);
-
-		List<String> netherBiomes = new ArrayList<>();
-		netherBiomes.add("NETHER_WASTES");
-		netherBiomes.add("SOUL_SAND_VALLEY");
-		netherBiomes.add("CRIMSON_FOREST");
-		netherBiomes.add("WARPED_FOREST");
-		netherBiomes.add("BASALT_DELTAS");
-		structuresBiomeGroups.put("nether", netherBiomes);
-
-		List<String> endBiomes = new ArrayList<>();
-		endBiomes.add("THE_END");
-		endBiomes.add("SMALL_END_ISLANDS");
-		endBiomes.add("END_MIDLANDS");
-		endBiomes.add("END_HIGHLANDS");
-		endBiomes.add("END_BARRENS");
-		structuresBiomeGroups.put("end", endBiomes);
+		// Default values are now loaded from src/main/resources/config.yml
 	}
 
 	public final String getTreeTypeName(final TreeType treeType) {
@@ -237,6 +159,162 @@ public class PluginConfig extends Skyoconfig {
 	 */
 	public void clearLoadedStructures() {
 		this.loadedTreeTypeStructures.clear();
+	}
+
+	/**
+	 * Loads decoration patterns from config into usable objects.
+	 */
+	@SuppressWarnings("unchecked")
+	public void loadDecorationPatterns() {
+		this.loadedDecorationPatterns.clear();
+
+		for (Map.Entry<String, HashMap<String, Object>> entry : decorationPatterns.entrySet()) {
+			String name = entry.getKey();
+			DecorationPattern pattern = parseDecorationPattern(name, entry.getValue());
+			if (pattern != null) {
+				this.loadedDecorationPatterns.put(name, pattern);
+			}
+		}
+	}
+
+	/**
+	 * Parses a decoration pattern from config data.
+	 *
+	 * @param name The pattern name
+	 * @param data The config data map
+	 * @return The parsed DecorationPattern, or null if invalid
+	 */
+	@SuppressWarnings("unchecked")
+	private DecorationPattern parseDecorationPattern(String name, Map<String, Object> data) {
+		try {
+			int minRadius = getIntValue(data.get("min-radius"), 2);
+			int maxRadius = getIntValue(data.get("max-radius"), 4);
+			int maxVerticalSearch = getIntValue(data.get("max-vertical-search"), 5);
+
+			List<String> replaceableBlocks = (List<String>) data.getOrDefault("replaceable-blocks",
+					List.of("AIR", "CAVE_AIR", "SHORT_GRASS"));
+			List<String> placeableOnBlocks = (List<String>) data.getOrDefault("placeable-on-blocks",
+					List.of("GRASS_BLOCK", "DIRT", "PODZOL"));
+
+			List<DecorationBlock> blocks = new ArrayList<>();
+			Object blocksData = data.get("blocks");
+			if (blocksData instanceof List) {
+				for (Object blockObj : (List<?>) blocksData) {
+					if (blockObj instanceof Map) {
+						Map<String, Object> blockMap = (Map<String, Object>) blockObj;
+						String material = (String) blockMap.get("material");
+						double chance = getDoubleValue(blockMap.get("chance"), 0.1);
+						boolean randomRotation = getBooleanValue(blockMap.get("random-rotation"), false);
+						int height = getIntValue(blockMap.get("height"), 1);
+
+						if (material != null) {
+							blocks.add(new DecorationBlock(material, chance, randomRotation, height));
+						}
+					}
+				}
+			}
+
+			return new DecorationPattern(name, minRadius, maxRadius, maxVerticalSearch,
+					blocks, replaceableBlocks, placeableOnBlocks);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
+	 * Gets a single decoration pattern for a tree type and biome.
+	 * For backwards compatibility - returns only the first pattern if multiple are configured.
+	 *
+	 * @param treeType The tree type
+	 * @param biome    The biome
+	 * @return The decoration pattern, or null if none configured
+	 */
+	public DecorationPattern getDecorationPattern(TreeType treeType, Biome biome) {
+		List<DecorationPattern> patterns = getDecorationPatterns(treeType, biome);
+		return patterns.isEmpty() ? null : patterns.get(0);
+	}
+
+	/**
+	 * Gets all decoration patterns for a tree type and biome.
+	 * Supports comma-separated pattern lists (e.g., "dark-oak-forest,mushroom-sparse").
+	 *
+	 * @param treeType The tree type
+	 * @param biome    The biome
+	 * @return List of decoration patterns, empty if none configured
+	 */
+	public List<DecorationPattern> getDecorationPatterns(TreeType treeType, Biome biome) {
+		String treeName = getTreeTypeName(treeType);
+		HashMap<String, String> treeDecorations = decorations.get(treeName);
+		if (treeDecorations == null) {
+			return Collections.emptyList();
+		}
+
+		// Find the biome group for this biome
+		String biomeName = biome.name();
+		String matchedGroup = null;
+		for (var entry : structuresBiomeGroups.entrySet()) {
+			if (entry.getValue().contains(biomeName)) {
+				matchedGroup = entry.getKey();
+				break;
+			}
+		}
+
+		// Try to get pattern for the matched biome group
+		String patternNames = null;
+		if (matchedGroup != null) {
+			patternNames = treeDecorations.get(matchedGroup);
+		}
+
+		// Fallback to default
+		if (patternNames == null || patternNames.equalsIgnoreCase("null")) {
+			patternNames = treeDecorations.get("default");
+		}
+
+		if (patternNames == null || patternNames.equalsIgnoreCase("null")) {
+			return Collections.emptyList();
+		}
+
+		// Support comma-separated pattern lists
+		if (patternNames.contains(",")) {
+			return Arrays.stream(patternNames.split(","))
+				.map(String::trim)
+				.map(loadedDecorationPatterns::get)
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
+		}
+
+		DecorationPattern pattern = loadedDecorationPatterns.get(patternNames);
+		return pattern != null ? List.of(pattern) : Collections.emptyList();
+	}
+
+	/**
+	 * Gets all loaded decoration pattern names.
+	 *
+	 * @return List of pattern names
+	 */
+	public List<String> getDecorationPatternNames() {
+		return new ArrayList<>(loadedDecorationPatterns.keySet());
+	}
+
+	private int getIntValue(Object value, int defaultValue) {
+		if (value instanceof Number) {
+			return ((Number) value).intValue();
+		}
+		return defaultValue;
+	}
+
+	private double getDoubleValue(Object value, double defaultValue) {
+		if (value instanceof Number) {
+			return ((Number) value).doubleValue();
+		}
+		return defaultValue;
+	}
+
+	private boolean getBooleanValue(Object value, boolean defaultValue) {
+		if (value instanceof Boolean) {
+			return (Boolean) value;
+		}
+		return defaultValue;
 	}
 
 }
