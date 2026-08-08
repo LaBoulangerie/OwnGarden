@@ -8,6 +8,7 @@ import java.util.List;
 public class DecorationPattern {
 
     private final String name;
+    private final DecorationTarget target;
     private final int minRadius;
     private final int maxRadius;
     private final int maxVerticalSearch;
@@ -29,7 +30,27 @@ public class DecorationPattern {
     public DecorationPattern(String name, int minRadius, int maxRadius, int maxVerticalSearch,
                              List<DecorationBlock> blocks, List<String> replaceableBlocks,
                              List<String> placeableOnBlocks) {
+        this(name, DecorationTarget.STRUCTURES, minRadius, maxRadius, maxVerticalSearch,
+                blocks, replaceableBlocks, placeableOnBlocks);
+    }
+
+    /**
+     * Creates a new decoration pattern with an explicit generation target.
+     *
+     * @param name              The pattern identifier
+     * @param target            Tree generation types this pattern applies to
+     * @param minRadius         Minimum radius around the tree
+     * @param maxRadius         Maximum radius around the tree
+     * @param maxVerticalSearch Maximum vertical search distance for ground level
+     * @param blocks            List of decoration blocks to place
+     * @param replaceableBlocks List of block types that can be replaced
+     * @param placeableOnBlocks List of block types decorations can be placed on
+     */
+    public DecorationPattern(String name, DecorationTarget target, int minRadius, int maxRadius,
+                             int maxVerticalSearch, List<DecorationBlock> blocks,
+                             List<String> replaceableBlocks, List<String> placeableOnBlocks) {
         this.name = name;
+        this.target = target;
         this.minRadius = minRadius;
         this.maxRadius = maxRadius;
         this.maxVerticalSearch = maxVerticalSearch;
@@ -45,6 +66,25 @@ public class DecorationPattern {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Gets the configured generation target.
+     *
+     * @return The generation target
+     */
+    public DecorationTarget getTarget() {
+        return target;
+    }
+
+    /**
+     * Checks whether this pattern applies to a generation type.
+     *
+     * @param generationType The generation type to check
+     * @return {@code true} if the pattern applies
+     */
+    public boolean appliesTo(DecorationTarget generationType) {
+        return target.includes(generationType);
     }
 
     /**

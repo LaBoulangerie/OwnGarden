@@ -82,6 +82,7 @@ Biomes are grouped for structure and decoration selection:
 
 Decorations (grass, flowers, mushrooms) are placed around trees based on biome. Each decoration pattern defines:
 
+- `apply-to` - Generation target: `STRUCTURES`, `VANILLA`, or `BOTH` (defaults to `STRUCTURES`)
 - `min-radius` / `max-radius` - Area around the tree
 - `replaceable-blocks` - Blocks that can be replaced (AIR, GRASS, etc.)
 - `placeable-on-blocks` - Valid ground blocks (GRASS_BLOCK, DIRT, etc.)
@@ -91,6 +92,7 @@ Example pattern:
 ```yaml
 decoration-patterns:
   oak-forest:
+    apply-to: BOTH
     min-radius: 2
     max-radius: 4
     blocks:
