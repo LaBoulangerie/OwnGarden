@@ -2,6 +2,7 @@ package fr.skyost.owngarden.config;
 
 import fr.skyost.owngarden.model.DecorationBlock;
 import fr.skyost.owngarden.model.DecorationPattern;
+import fr.skyost.owngarden.model.DecorationTarget;
 import fr.skyost.owngarden.util.Skyoconfig;
 
 import org.bukkit.TreeType;
@@ -187,6 +188,7 @@ public class PluginConfig extends Skyoconfig {
 	@SuppressWarnings("unchecked")
 	private DecorationPattern parseDecorationPattern(String name, Map<String, Object> data) {
 		try {
+			DecorationTarget target = getDecorationTarget(data.get("apply-to"));
 			int minRadius = getIntValue(data.get("min-radius"), 2);
 			int maxRadius = getIntValue(data.get("max-radius"), 4);
 			int maxVerticalSearch = getIntValue(data.get("max-vertical-search"), 5);
@@ -214,7 +216,7 @@ public class PluginConfig extends Skyoconfig {
 				}
 			}
 
-			return new DecorationPattern(name, minRadius, maxRadius, maxVerticalSearch,
+			return new DecorationPattern(name, target, minRadius, maxRadius, maxVerticalSearch,
 					blocks, replaceableBlocks, placeableOnBlocks);
 		} catch (Exception e) {
 			return null;
@@ -315,6 +317,17 @@ public class PluginConfig extends Skyoconfig {
 			return (Boolean) value;
 		}
 		return defaultValue;
+	}
+
+	private DecorationTarget getDecorationTarget(Object value) {
+		if (value == null) {
+			return DecorationTarget.STRUCTURES;
+		}
+		try {
+			return DecorationTarget.valueOf(value.toString().trim().toUpperCase());
+		} catch (IllegalArgumentException e) {
+			return DecorationTarget.STRUCTURES;
+		}
 	}
 
 }

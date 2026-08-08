@@ -3,6 +3,7 @@ package fr.skyost.owngarden.listener;
 import fr.skyost.owngarden.OwnGarden;
 import fr.skyost.owngarden.config.PluginConfig.HeightCheckFailBehavior;
 import fr.skyost.owngarden.model.DecorationPattern;
+import fr.skyost.owngarden.model.DecorationTarget;
 import fr.skyost.owngarden.util.DecorationPlacer;
 
 import java.util.Collection;
@@ -224,20 +225,98 @@ public class GlobalEventsListener implements Listener {
                 rotation, mirror, -1, 1, RANDOM,
                 blockTransformers, Collections.emptyList());
 
-        // Place decorations if configured
-        List<DecorationPattern> decorationPatterns = this.plugin.getOwnGardenConfig()
-                .getDecorationPatterns(treeType, biome);
-        if (!decorationPatterns.isEmpty()) {
-            Location decorationCenter = is2x2 && origin2x2 != null
-                    ? origin2x2.clone().add(0.5, 0, 0.5)
-                    : location.clone();
-            for (DecorationPattern decorationPattern : decorationPatterns) {
-                DecorationPlacer.placeDecorations(decorationCenter, decorationPattern, is2x2);
-            }
-        }
+        Location decorationCenter = is2x2 && origin2x2 != null
+                ? origin2x2.clone().add(0.5, 0, 0.5)
+                : location.clone();
+        placeConfiguredDecorations(treeType, biome, decorationCenter, is2x2,
+                DecorationTarget.STRUCTURES);
 
         event.getBlocks().clear();
         event.setCancelled(true);
+    }
+
+    /**
+     * Places decorations after Minecraft has committed an uncancelled vanilla tree growth.
+     */
+    @EventHandler(priority = EventPriority.MONITOR)
+    final void onVanillaStructureGrow(StructureGrowEvent event) {
+        if (event.isCancelled() || event.getBlocks().isEmpty()) {
+            return;
+        }
+
+        Location location = event.getLocation();
+        TreeType treeType = event.getSpecies();
+        Biome biome = location.getBlock().getBiome();
+
+        boolean hasVanillaDecorations = this.plugin.getOwnGardenConfig()
+                .getDecorationPatterns(treeType, biome).stream()
+                .anyMatch(pattern -> pattern.appliesTo(DecorationTarget.VANILLA));
+        if (!hasVanillaDecorations) {
+            return;
+        }
+
+        List<ExpectedGrowthBlock> expectedGrowthBlocks = event.getBlocks().stream()
+                .filter(state -> isGrowthMaterial(state.getType()))
+                .map(state -> new ExpectedGrowthBlock(state.getBlock(), state.getType()))
+                .toList();
+        if (expectedGrowthBlocks.isEmpty()) {
+            return;
+        }
+
+        boolean is2x2 = is2x2Tree(treeType);
+        Location decorationCenter = location.clone();
+        if (is2x2) {
+            Location origin2x2 = find2x2Origin(location, location.getBlock().getType());
+            if (origin2x2 != null) {
+                decorationCenter = origin2x2.clone().add(0.5, 0, 0.5);
+            } else {
+                is2x2 = false;
+            }
+        }
+
+        Location scheduledCenter = decorationCenter;
+        boolean scheduledIs2x2 = is2x2;
+        this.plugin.getServer().getScheduler().runTask(this.plugin, () -> {
+            // MONITOR listeners only observe an attempted growth. Confirm on the next tick
+            // that Minecraft actually committed at least one structural growth block.
+            if (event.isCancelled() || expectedGrowthBlocks.stream().noneMatch(ExpectedGrowthBlock::isApplied)) {
+                return;
+            }
+
+            placeConfiguredDecorations(treeType, biome, scheduledCenter,
+                    scheduledIs2x2, DecorationTarget.VANILLA);
+        });
+    }
+
+    private static boolean isGrowthMaterial(Material material) {
+        return Tag.LOGS.isTagged(material)
+                || Tag.LEAVES.isTagged(material)
+                || material == Material.BROWN_MUSHROOM_BLOCK
+                || material == Material.RED_MUSHROOM_BLOCK
+                || material == Material.MUSHROOM_STEM
+                || material == Material.CHORUS_PLANT
+                || material == Material.CHORUS_FLOWER;
+    }
+
+    private record ExpectedGrowthBlock(Block block, Material expectedMaterial) {
+
+        private boolean isApplied() {
+            return block.getType() == expectedMaterial;
+        }
+    }
+
+    /**
+     * Places configured patterns that accept the requested generation type.
+     */
+    private void placeConfiguredDecorations(TreeType treeType, Biome biome, Location center,
+                                            boolean is2x2, DecorationTarget generationType) {
+        List<DecorationPattern> decorationPatterns = this.plugin.getOwnGardenConfig()
+                .getDecorationPatterns(treeType, biome);
+        for (DecorationPattern decorationPattern : decorationPatterns) {
+            if (decorationPattern.appliesTo(generationType)) {
+                DecorationPlacer.placeDecorations(center, decorationPattern, is2x2);
+            }
+        }
     }
 
     /**

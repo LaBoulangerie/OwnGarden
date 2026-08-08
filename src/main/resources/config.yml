@@ -63,6 +63,17 @@ decoration-patterns:
       - {material: DEAD_BUSH, chance: 0.15}
       - {material: SHORT_GRASS, chance: 0.05}
 
+  # Mangrove pattern applied to Minecraft's default mangrove trees
+  mangrove-default:
+    apply-to: VANILLA
+    min-radius: 2
+    max-radius: 4
+    max-vertical-search: 5
+    replaceable-blocks: [AIR, CAVE_AIR, SHORT_GRASS, TALL_GRASS]
+    placeable-on-blocks: [GRASS_BLOCK, DIRT, PODZOL, COARSE_DIRT, ROOTED_DIRT, MUD]
+    blocks:
+      - {material: FIREFLY_BUSH, chance: 0.8}
+
   # Birch patterns
   birch-meadow:
     min-radius: 2
@@ -244,3 +255,5 @@ decorations:
   dark_oak:
     default: dark-oak-forest,mushroom-sparse
     forest: dark-oak-forest
+  mangrove:
+    default: mangrove-default
